@@ -189,9 +189,9 @@ class RestApi(object):
         try:
             raw_response = self.response.raw
         except Exception as e:
-            print("-"*80, file=sys.stderr)
+            #print("-"*80, file=sys.stderr)
             traceback.print_exc(file=sys.stderr)
-            print("-"*80, file=sys.stderr)
+            #print("-"*80, file=sys.stderr)
             raise e
 
         self.data = self.response.json()
@@ -200,12 +200,12 @@ class RestApi(object):
             raise OpenShift500Exception('Internal Server Error: %s' % self.data)
 
         if self.response.status_code == (200 or 201):
-            print("-"*80, file=sys.stderr)
+            #print("-"*80, file=sys.stderr)
             log.debug("status:  %s" % self.response.status_code)
             #log.debug("msg: %s" % self.data()['messages'][0]['text'])
             # the raw_response is not available
             #log.debug("raw:  %s"%raw_response)
-            print("-"*80, file=sys.stderr)
+            #print("-"*80, file=sys.stderr)
         return (self.response.status_code, self.data)
 
 
@@ -327,7 +327,7 @@ class Openshift(object):
     #@conditional_decorator(timeit, DOING_PERFORMANCE_ANALYSIS)
     # TODO: should the rhlogin really be hardcoded in this function?
     def domain_create(self, name, rhlogin='nate@appsembler.com'):
-        log.debug("Creating domain '%s'" % name)
+        log.info("Creating domain '%s'" % name)
         params = {
             'id': name,
             'rhlogin': rhlogin
@@ -339,12 +339,12 @@ class Openshift(object):
     @conditional_decorator(timeit, DOING_PERFORMANCE_ANALYSIS)
     def domain_delete(self, domain_name=None, force=True):
         """ destroy a user's domain, if no name is given, figure it out"""
-        log.debug("Deleting domain '%s'" % domain_name)
+        log.info("Deleting domain '%s'" % domain_name)
         if domain_name is None:
             status, domain_name = self.domain_get()
 
         url, method = self.get_href('/domains', 'delete', domain_name)
-        log.info("URL: %s" % url)
+        log.debug("URL: %s" % url)
         #res = self.rest.response.data[0]['links']['DELETE']
         if force:
             params = {'force': 'true'}
@@ -362,7 +362,7 @@ class Openshift(object):
 
     @conditional_decorator(timeit, DOING_PERFORMANCE_ANALYSIS)
     def domain_get(self, name=None):
-        log.info("Getting domain information...")
+        log.debug("Getting domain information...")
         url, method = self.get_href('/domains', 'get', name)
         if url == 'Not Found':
             return ('Not Found', None)
@@ -376,7 +376,7 @@ class Openshift(object):
                 return (status, self.rest.response.json()['data'][domain_index_name])
 
     def domain_list(self):
-        log.info("Listing domain information...")
+        log.debug("Listing domain information...")
         domains = []
         for url, method in self.yield_href('/domains', 'get'):
             (status, raw_response) = self.rest.request(method=method, url=url)
@@ -661,7 +661,7 @@ class Openshift(object):
                 # found match, now do your stuff
                 params_dict = app['links'][action]
                 method = params_dict['method']
-                log.info("Action: %s" % action)
+                log.debug("Action: %s" % action)
                 data = {}
                 if len(params_dict['required_params']) > 0:
                     param_name = params_dict['required_params'][0]['name']
