@@ -274,9 +274,6 @@ class Openshift(object):
                 res = entry['links'][index]
 
                 yield (res['href'], res['method'])
-        else:
-            raise OpenShiftNullDomainException("No domain has been initialized.")
-            #return ('Not Found', self.rest.response.json)
 
     ##### /user  (sshkey)
     #@conditional_decorator(timeit, DOING_PERFORMANCE_ANALYSIS)
